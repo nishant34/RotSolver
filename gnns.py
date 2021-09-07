@@ -13,7 +13,7 @@ import jax
 
 "This file has gnns implemented(for differentiable rotation averaging) in jax to be merged with mip-nerf"
 
-
+Num_curr = 18
 
 class RotSolverModel:
     "class implementing  graph convolutional networks........"
@@ -96,17 +96,17 @@ class RotSolverModel:
         """
         inputs, adj, is_training, rng = batch #idx--> train_check
         inputs_1 = np.reshape(inputs, (-1,3,3))
-        inputs_1 = np.repeat(inputs_1, 11, axis=0)
-        print("inputs_1 shape is:{}".format(inputs_1.shape))
+        inputs_1 = np.repeat(inputs_1, Num_curr, axis=0)
+        #print("inputs_1 shape is:{}".format(inputs_1.shape))
         preds = self._pred_fun_(params, inputs, adj, is_training=is_training, rng=rng)
         preds = np.reshape(preds, (-1,3,3))
         self.preds = preds
         #print("The preds are:{}".format(preds))
-        d = np.outer(preds, np.linalg.inv(preds)) #(11*9,11*9)
+        d = np.outer(preds, np.linalg.inv(preds)) #(Num_curr*9,Num_curr*9)
         #d = np.reshape(d,(-1,9))
-        d = np.reshape(d,(99,11,9))
+        d = np.reshape(d,(Num_curr*9,Num_curr,9))
         d = np.sum(d,-1)
-        d = np.reshape(d,(11,9,11))
+        d = np.reshape(d,(Num_curr,9,Num_curr))
         d = np.transpose(d,(0,2,1))
         d = np.reshape(d,(-1,9))
         #e =np.tril_indices(d)
